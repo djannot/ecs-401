@@ -79,7 +79,7 @@ The controller and driver can be deployed on the same node or different nodes, a
 For this lab, the COSBench Docker container is already placed in the Spark VM. 
 
 **Note:** In general, you can pull the COSBench Docker container image using the command below:
-`docker pull djannot/cosbench`
+`docker pull djannot/cosbench:0.4.2.c4`
 
 Start the container that resided in your VM, by executing:
 
