@@ -231,7 +231,7 @@ Once the configuration is successfully saved, go to *Schedule* and configure a s
 
 Clicking in *show advanced options*, you can select the *Log Level* or the *DB type* among other options. 
 
->**Note:** Please, don't use DB in the vLab to avoid potential issues with this light ECS-Sync-UI image. There is no problem configuring the DB when using the regular ECS-Sync OVA.
+> **Note:** Please, don't use DB in the vLab to avoid potential issues with this light ECS-Sync-UI image. There is no problem configuring the DB when using the regular ECS-Sync OVA.
 
 The *Schedule* tab shows all the Scheduled ECS-Sync copies in the ECS-Sync VM.
 

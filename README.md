@@ -2,7 +2,7 @@
 
 The ECS 401 training is focusing on hands-on labs to allow participants to become more familiar with different  ECS features and use cases. 
 
-- [S3, Swift and Atmos APIs](api/api.md)
+- [S3, Swift and Atmos APIs](apis/apis.md)
 - [ECS-Sync](ecssync/ecssync.md)
 - [Spark](spark/spark.md)
 - NFS
