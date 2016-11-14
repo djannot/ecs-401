@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workload name="ECS MAX Tests" description="ECS MAX Test">
+<storage type="s3" config="path_style_access=true;accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;proxyhost=;proxyport=;endpoint=http://ecs-1-1.vlab.local:9020"/>
+
+<workflow>
+      <workstage name="init">
+         <work type="init" workers="1" config="cprefix=test-10k-;containers=r(1,1);driver=driver1" />
+         <work type="init" workers="1" config="cprefix=test-100k-;containers=r(1,1);driver=driver2" />
+      </workstage>
+      <workstage name="prepare">
+         <work type="prepare" workers="10" config="cprefix=test-10k-;containers=r(1,1);objects=r(1,100);sizes=c(10)KB;driver=driver1"/>
+         <work type="prepare" workers="10" config="cprefix=test-100k-;containers=r(1,1);objects=r(1,100);sizes=c(100)KB;driver=driver2"/>
+      </workstage>
+      <workstage name="10Kworkload">
+         <work name="vdc1" workers="20" totalOps="200" >
+            <operation type="write" ratio="20"  config="cprefix=test-10k-;containers=s(1,1);objects=s(101,200);sizes=c(10)KB;driver=driver1"/>
+            <operation type="read" ratio="80" config="cprefix=test-10k-;containers=s(1,1);objects=s(1,100);driver=driver1"/>
+         </work>
+      </workstage>
+      <workstage name="100kworkload">
+        <work name="vdc1" workers="20" totalOps="200">
+           <operation type="write" ratio="20"  config="cprefix=test-100k-;containers=s(1,1);objects=s(101,200);sizes=c(100)KB;driver=driver2"/>
+           <operation type="read" ratio="80" config="cprefix=test-100k-;containers=s(1,1);objects=s(1,100);driver=driver2"/>
+          </work>
+      </workstage>     
+       <workstage name="cleanup">
+         <work type="cleanup" workers="20" config="cprefix=test-10k-;containers=r(1,1);objects=r(1,200);driver=driver1" />
+         <work type="cleanup" workers="20" config="cprefix=test-100k-;containers=r(1,1);objects=r(1,200);driver=driver2" />
+       </workstage>
+      <workstage name="dispose">
+          <work type="dispose" workers="1" config="cprefix=test-10k-;containers=r(1,1);driver=driver1" />
+          <work type="dispose" workers="1" config="cprefix=test-100k-;containers=r(1,1);driver=driver2" />
+       </workstage>
+   </workflow>
+</workload>

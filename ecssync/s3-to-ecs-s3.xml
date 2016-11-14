@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--This is a sample configuration to migrate an AWS S3 bucket to an ECS S3 bucket, including all object versions. It uses 32 threads, verifies data using MD5 checksums and tracks status of all objects in a database table.-->
+<syncConfig xmlns="http://www.emc.com/ecs/sync/model"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.emc.com/ecs/sync/model model.xsd">
+    <options>
+        <threadCount>32</threadCount>
+        <verify>true</verify>
+    </options>
+
+    <source>
+        <awsS3Config>
+            <host>192.168.1.11</host><!-- defaults to HTTPS -->
+            <port>9020</port>
+            <protocol>http</protocol>
+            <accessKey>ecssync_user1</accessKey>
+            <secretKey>cJv394eB8/DheamTK/iuutuCsz/f5HWUknMtW//H</secretKey>
+            <disableVHosts>true</disableVHosts>
+            <legacySignatures>true</legacySignatures>
+            <bucketName>bucketssource</bucketName>
+            <createBucket>false</createBucket>
+        </awsS3Config>
+    </source>
+
+    <target><!-- TODO: change this to ecsS3Config when available -->
+        <awsS3Config>
+            <host>192.168.1.11</host><!-- defaults to HTTPS -->
+            <port>9020</port>
+            <protocol>http</protocol>
+            <accessKey>ecssync_user2</accessKey>
+            <secretKey>6gRNVQ9MQuElCPQrZcCZ0mcjKvwJOTrahiI8H2S1</secretKey>
+            <disableVHosts>true</disableVHosts>
+            <legacySignatures>true</legacySignatures>
+            <bucketName>buckettargets3</bucketName>
+            <createBucket>false</createBucket>
+        </awsS3Config>
+    </target>
+</syncConfig>

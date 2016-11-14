@@ -1,0 +1,5 @@
+s3 ping ngnix
+
+VM witht he containers : 10.231.64.41
+Ports 80/443 - ngnix
+Ports 9020/9021 - vTM
