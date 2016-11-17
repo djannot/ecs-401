@@ -26,8 +26,6 @@ It's done under *manage->buckets->New Bucket*. It is possible to pre-select the 
 
 Name the bucket *xyzarchivebucket*, validate that the namespace is *xyzarchive* and ensure that the Bucket Owner is the previously created object user, *writer*. Below this select *Enable* for File System and fill in *writers* as the group name and allow read/write in both columns.
 
-CBNOTE: leave the Default Bucket Group and permissions blank. If the setup is a GEO ECS, the ‘Access During Outage’ can be enabled if the Replication Group contains multiple sites. No other bucket settings should be set.
-
 ##Prepare the linux host
 Before configuring the export on the ECS, user(s)/group(s) and mount point for the share is needed on the client.
 Logging onto the linux host and switching to root, create the group *writers* with GID *5000*;

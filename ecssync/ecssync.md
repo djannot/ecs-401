@@ -28,24 +28,23 @@ This lab we will be focused on two of the most common use cases that could be va
 The latest ECS-Sync release is available in the Gihub repository:
 https://github.com/EMCECS/ecs-sync/releases
 
->**Note:** There is also an OVA file that contains a Linux image and the required tools to run ECS-Sync. This VM includes the software required to run ECS-Sync and other tools used for migrating data:
+>**Note:** There is also an OVA file that contains a Linux image and the required tools to run ECS-Sync. This VM includes the software required to run ECS-Sync and other tools used for migrating data. Please, refer to Appendix 3 for more information about the OVA. It is the recommended option when using ECS-Sync in a customer site.
 
->- Java 1.7
-- MySQL
-- CAS SDK
+In this Lab, we'll use ECS-Sync CLI directly running on your Spark VM, and ECS-Sync UI running on a Docker container in the same Spark VM.
 
->However, this OVA may not come with the latest ECS-Sync version; if that is the case, just copy the new ECS-Sync directory to the */root/ directory* in the ECS-Sync VM and remember to use the latest jar file in your ECS-Sync copy command.
+- For the ECS-Sync CLI we will use the latest ECS-Sync version directly on your Spark VM: *ecs-sync 3.0 beta 2*.
+- For the ECS-Sync UI we will use *ecs-sync v2.1.2* in a Docker Container, since the UI is not available in *ecs-sync 3.0*yet.
 
->The OVA file is about 750MB and can be downloaded from [http://bit.ly/ecs-sync-server](http://bit.ly/ecs-sync-server) 
+**Task:**
 
-Get the latest ECS-Sync release from your Spark VM:
+- From your Spark VM, get the latest ECS-Sync CLI release:
 
 ```
 wget https://github.com/EMCECS/ecs-sync/releases/download/v3.0-beta.2/ecs-sync-3.0-beta.2.zip
 unzip ecs-sync-3.0-beta.2.zip
 ```
 
-If Java is not installed, please do it.
+- If Java is not installed, please do it.
 
 ```
 yum install java
@@ -89,12 +88,13 @@ For this lab, please use the ECS F&F deployed in your lab:
 
 ## 1 - ECS Configuration
 
+**Task:**
+
 - Create an ECS object user called *ecssync_user1* and get its secret key. 
 - Create an ECS object user called *ecssync_user2* and get its secret key. 
 - Create a bucket called *bucketssource*, own by *ecssync_user1* 
-    - Upload a few objects to this bucket
 - Create a bucket with FS disabled called *buckettargets3*, owned by *ecssync_user2*
-- Create a bucket with FS enabled called *bucketteargetnfs*, owned by *ecssync_user2*
+- Create a bucket with FS enabled called *buckettargetnfs*, owned by *ecssync_user2*
 
 ## 2 - ECS-Sync Configuration
 
@@ -113,8 +113,6 @@ There are several ECS-Sync execution paths:
 
 We'll use mainly ECS-Sync CLI and ECS-Sync UI in this lab.
 
-- For the ECS-Sync CLI we will use the latest and greatest version directly on your Spark VM: *ecs-sync 3.0 beta 2*.
-- For the ECS-Sync UI we will use *ecs-sync v2.1.2* in a Docker Container, since it is not available in *ecs-sync 3.0*yet.
 
 # 3 - ECS-Sync copy tasks
 
@@ -142,8 +140,24 @@ XML samples files are located in the *sample* directory, in your ECS-Sync direct
  
 We'll use the *directory-to-ecs-s3.xml* file as a template for the FS to ECS S3 copy.
 
+Take a look at the *directory-to-ecs-s3.xml* template:
+
+`cat sample/directory-to-ecs-s3.xml `
+
+**Task:** FS to ECS S3 copy using a XML file
+
+- Using the *directory-to-ecs-s3.xml* template as a reference, we'll create a FS to ECS S3 copy job
+
+Source | Target
+--- | ---
+Filesystem on the ECS-Sync VM | ECS S3 Bucket
+/root/ecs-sync-3.0-beta.2/sample/ | buckettargetnfs
+
+- Create a new *directory-to-ecs-s3-test.xml* file in the sample directory with the following configuration (simplified template):
+
+`vi sample/directory-to-ecs-s3-test.xml `
+
 ```
-cat sample/directory-to-ecs-s3-test.xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <syncConfig xmlns="http://www.emc.com/ecs/sync/model" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.emc.com/ecs/sync/model model.xsd">
     <syncOptions>
@@ -167,7 +181,7 @@ cat sample/directory-to-ecs-s3-test.xml
             <secretKey>6gRNVQ9MQuElCPQrZcCZ0mcjKvwJOTrahiI8H2S1</secretKey>
             <disableVHosts>true</disableVHosts>
             <legacySignatures>true</legacySignatures>
-            <bucketName>bucketteargetnfs</bucketName>
+            <bucketName>buckettargetnfs</bucketName>
             <createBucket>false</createBucket>
             <!-- default behavior is to preserve directories (including empty ones) for later restoration -->
             <preserveDirectories>false</preserveDirectories>
@@ -177,15 +191,12 @@ cat sample/directory-to-ecs-s3-test.xml
 
 ```
 
-This ECS-Sync job copies data from the File System */root/ecs-sync-3.0-beta.2/sample/* to the S3 ECS bucket *bucketteargetnfs*.
+> This ECS-Sync job copies data from the File System */root/ecs-sync-3.0-beta.2/sample/* to the S3 ECS bucket *buckettargetnfs*.
 
-Source | Target
---- | ---
-Filesystem on the ECS-Sync VM | ECS S3 Bucket
-/root/ecs-sync-3.0-beta.2/sample/ | bucketteargetnfs
-
-Execute the ECS-Sync copy:
+- Execute the ECS-Sync copy:
 `java -jar ecs-sync-3.0-beta.2.jar --xml-config sample/directory-to-ecs-s3-test.xml`
+
+- This is the expected output you should get:
 
 ```
 EcsSync v3.0-beta.2
@@ -195,9 +206,12 @@ Successful files: 12 (12/s) Failed Files: 0
 Failed files: []
 ```
 
+- Verify with S3 Browser that *buckettargetnfs* has been populated with the files from */root/ecs-sync-3.0-beta.2/sample/*.
+
+
 ### 3.1.2 - ECS-Sync UI
 
-ECS-Sync also provides a browser–based User Interface (UI) for ease of use from version 2.1, but not available yet for version 3.0. For this lab we will use ecs-sync-ui-2.1.2. Please refer to *Appendix 1 -  Launching a ECS-Sync UI Docker Container in the vLab* and launch an ECS-Sync UI cont	ainer. Create a bucket with FS enabled called *bucketteargetnfsui*, owned by *ecssync_user2*
+ECS-Sync also provides a browser–based User Interface (UI) for ease of use from version 2.1, but not available yet for version 3.0. For this lab we will use ecs-sync-ui-2.1.2. 
 
 ECS-Sync UI provides:
 
@@ -208,36 +222,37 @@ ECS-Sync UI provides:
 - Email notifications (start, complete, error)
 - Configuration stored in ECS - VM is disposable
 
-Once your ECS-Sync UI instance is launched, configure the ECS-Sync copy parameters. Go to *Config*, indicate the *ECS endpoints*, *ECS User = ecssync_user2* and *Secret Key = ecssync_user2_secret_key*, and an email for alerts. Click *Save & Write Configuration to ECS*.
+**Task:**
+
+- Please refer to *Appendix 1 -  Launching a ECS-Sync UI Docker Container in the vLab* and launch an ECS-Sync UI container.
+
+- Create a bucket with FS enabled called *buckettargetnfsui*, owned by *ecssync_user2*
+
+- Access the ECS-Sync UI using a Web Browser: `http://192.168.1.30:8080`
+
+- Once your ECS-Sync UI instance is launched, configure the ECS-Sync copy parameters:
+    -  Go to *Config*, indicate the *ECS endpoint = 192.168.1.11*, *ECS User = ecssync_user2* and *Secret Key = ecssync_user2_secret_key*, and an email for alerts. Click *Save & Write Configuration to ECS*.
 
 >**Note:** In the current ECS-Sync UI version a bucket called *ecs-sync* will be created to save the ECS-Sync UI configuration. This bucket cannot be used as a target for the ECS-Sync copy.
 
 ![UI1](ui1_new.jpg)
 
-```
->**Note:**When using the ECS-Sync OVA, if you get a *Service  Unavailable* when lauching the ECS-Sync UI, please make sure the services are started:
 
-`sudo service ecs-sync start && sudo service ecs-sync-ui start`
-
-```
-
-Once the configuration is successfully saved, go to *Schedule* and configure a schedule for the copy.
-
-- Indicate */tmp/nfssource* as the *Filesystem Source Directory*
-- Indicate *bucketteargetnfsui* as the *ECS S3 Target Bucket*
+- Once the configuration is successfully saved, go to *Schedule* and configure a schedule for the copy.
+    - Indicate */tmp/nfssource* as the *Filesystem Source Directory*
+    - Indicate *buckettargetnfsui* as the *ECS S3 Target Bucket*
 
 ![UI3](ui3_new.jpg)
  
 
-Clicking in *show advanced options*, you can select the *Log Level* or the *DB type* among other options. 
+- Clicking in *show advanced options*, you can select the *Log Level* or the *DB type* among other options. 
+    - Please, don't use DB in the vLab to avoid potential issues with this light ECS-Sync-UI image. There is no problem configuring the DB when using the regular ECS-Sync OVA.
 
-> **Note:** Please, don't use DB in the vLab to avoid potential issues with this light ECS-Sync-UI image. There is no problem configuring the DB when using the regular ECS-Sync OVA.
-
-The *Schedule* tab shows all the Scheduled ECS-Sync copies in the ECS-Sync VM.
+- The *Schedule* tab shows all the Scheduled ECS-Sync copies in the ECS-Sync VM.
 
  ![UI5](ui5_new.jpg)
 
-There is also a *Reports* tab that shows all the copy reports.
+- There is also a *Reports* tab that shows all the copy reports.
 
 ### 3.1.3 - Isilon Backup
 
@@ -253,10 +268,23 @@ This section will show how to perform a copy from a S3 bucket to an ECS S3 bucke
 
 In this case, since we cannot use Amazon as a source, we'll copy from a S3 ECS bucket to another S3 ECS bucket. 
 
-We'll use the *s3-to-ecs-s3.xml* file as a template for the S3 to ECS S3 copy.
+
+**Task:** S3 to ECS S3 copy using a XML file
+
+- Using the *s3-to-ecs-s3.xml* template as a reference, we'll create a S3 to ECS S3 copy job
+
+Source | Target 
+--- | ---
+ECS S3 Bucket | ECS S3 Bucket 
+bucketssource | buckettargets3 
+
+- Populate the ECS S3 Bucket *bucketssource* with a few objects (S3 Browser), so that you can actually copy data.
+ 
+- Create a new *s3-to-ecs-s3-test.xml* file in the sample directory with the following configuration (simplified template):
+
+`vi sample/s3-to-ecs-s3-test.xml `
 
 ```
-cat sample/s3-to-ecs-s3-test.xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--This is a sample configuration to migrate an AWS S3 bucket to an ECS S3 bucket, including all object versions. It uses 32 threads, verifies data using MD5 checksums and tracks status of all objects in a database table.-->
 <syncConfig xmlns="http://www.emc.com/ecs/sync/model"
@@ -298,18 +326,13 @@ cat sample/s3-to-ecs-s3-test.xml
 
 ```
 
-Modify the XML file in order to configure a copy from the S3 ECS Bucket *bucketssource*, owned by *ecssync_user1* to *buckettargets3*, owned by *ecssync_user2*
+> This ECS-Sync job copies data from S3 ECS Bucket *bucketssource*, owned by *ecssync_user1* to *buckettargets3*, owned by *ecssync_user2*
 
-Source | Target 
---- | ---
-ECS S3 Bucket | ECS S3 Bucket 
-bucketssource | buckettargets3 
-
-Populate the ECS S3 Bucket *bucketssource* with a few objects, so that you can actually copy data.
-
-Execute the ECS-Sync copy:
+- Execute the ECS-Sync copy:
 
 `java -jar ecs-sync-3.0-beta.2.jar --xml-config sample/s3-to-ecs-s3-test.xml`
+
+- This is the expected output you should get:
 
 ```
 EcsSync v3.0-beta.2
@@ -389,18 +412,20 @@ ETA: 10h 41m 10s 605ms
 
 >**Note:** In order to enable performance monitoring for reads and writes when using the ECS-Sync CLI, you must include *--monitor-performance* in your copy command. 
 
-When using the ECS-Sync UI it is also posible to modify a few of these parameters, like the number of threads. Please go through the *Advance options* in the UI to review these options.
+When using the ECS-Sync UI it is also possible to modify a few of these parameters, like the number of threads. Please go through the *Advance options* in the UI to review these options.
 
 ### 3.3.2 -  ECS-Sync Copy parameters
 
 This section explains how to configure and tune the most common parameters used in ECS-Sync copies.
 
-**Task:** Please re-use the XML file you created in *Section 3.1 - NFS to ECS S3*, modifying source and target, so that you can tune the parameters explained in this section.
+**Task:** 
 
-- Source: Create a File System according to *Apendix 2 - Generating a data set as a source for the NFS to ECS S3 copy*
-- Target: Create a bucket called *bucketteargetnfs2*, owned by *ecssync_user2*
+- Please re-use the XML file you created in *Section 3.1 - NFS to ECS S3*, `sample/directory-to-ecs-s3-test.xml`, modifying source and target, so that you can tune the parameters explained in this section.
 
-Run the copy job as many times as needed in order to play with the different options below. Be aware that the first copy will be a full copy while the following ones will be incremental (faster) copies.
+    - Source: Create a File System according to *Apendix 2 - Generating a data set as a source for the NFS to ECS S3 copy
+    - Target: Create a bucket called *buckettargetnfs2*, owned by *ecssync_user2*
+
+- Run the copy job as many times as needed in order to play with the different options below. Be aware that the first copy will be a full copy while the following ones will be incremental (faster) copies.
 
 #### *Number of threads*
 
@@ -509,9 +534,18 @@ This is a workaround to get the ECS-Sync UI available in the vLab. If you want t
 
 In this case, we'll use an old ECS-Sync version since the ECS-Sync Ui is not available yet in 3.0.
 
+- Remove a Zeppeling container that is running by default in your Spark VM to avoid port conflicts:
+
+`docker ps -a`
+`docker rm -f <spark-ecs-s3-zeppelin_contanerID>`
+
 - Pull the ECS-Sync Docker Container from GitHub:
 
 `docker pull  djannot/ecs-sync-ui:2.1.2`
+
+- Make sure the firewall is stopped in your Spark VM:
+
+`systemctl status firewalld`
 
 - Create a directory called */tmp/nfssource* in your Spark VM.
 
@@ -519,7 +553,7 @@ In this case, we'll use an old ECS-Sync version since the ECS-Sync Ui is not ava
 
 `docker run -it -v /tmp/nfssource:/tmp/nfssource --net=host djannot/ecs-sync-ui:2.1.2 bash`
 
-Please, note that */tmp/nfssource* in the Docker container will be mapped to */tmp/nfssource* in your Spark VM, so that you can copy data from this directory.
+> Please, note that */tmp/nfssource* in the Docker container will be mapped to */tmp/nfssource* in your Spark VM, so that you can copy data directly from this directory.
 
 - Run the ECS-Sync-UI:
 
@@ -546,6 +580,18 @@ for a in {1..4};do
 done
 
 ```
+# Apendix 3 - ECS-Sync OVA
+
+The ECS-Sync OVA is the preferred option when deploying ECS-Sync in a customer site, since it includes the ECS-Sync CLI and UI, and other useful tools, like Java 1.7, MySQL and CAS SDK.
+
+However, this ECS-Sync OVA may not come with the latest ECS-Sync version; if that is the case, just copy the new ECS-Sync directory to the */root/ directory* in the ECS-Sync VM and remember to use the latest jar file in your ECS-Sync copy command.
+
+The OVA file is about 750MB and can be downloaded from [http://bit.ly/ecs-sync-server](http://bit.ly/ecs-sync-server) 
+
+>**Note:**When using the ECS-Sync OVA, if you get a *Service  Unavailable* when lauching the ECS-Sync UI, please make sure the services are started:
+
+> `sudo service ecs-sync start && sudo service ecs-sync-ui start`
+
 
 #References
 

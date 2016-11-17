@@ -41,6 +41,12 @@ docker run -it -p 8080:8080 djannot/docker-zeppelin bash
 
 You're now inside the Docker container.
 
+Install *vim* to be able to edit the configuration file later:
+```
+apt-get update
+apt-get install vim
+```
+
 Go to `/usr/hadoop-3.0.0-alpha1/lib` and run the command below to download the Amazon S3 SDK:
 
 ```

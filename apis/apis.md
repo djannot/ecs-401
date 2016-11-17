@@ -46,11 +46,15 @@ If you are using your own ECS system, then you need to indicate the correspondin
 
 # Lab
 
+You can now run all the examples provided for the different APIs.
+
 ## Amazon S3 API
 
 Go to *S3 API* -> *Requests*
 
 ![S3 API](s3.png)
+
+> WARNING: Don't select any bucket in the *Bucket Name* field. Otherwise, it will break the different examples you'll go through later.
 
 You will simply click on the examples.
 
@@ -123,6 +127,8 @@ On Amazon or other S3 compatible platforms, there is no similar feature availabl
 
 ### Apply an expiration to a bucket
 
+> WARNING: Use *testbucket3* instead of *testbucket2* in the different steps and don't delete the object and bucket at the end. The object will be automatically deleted the following day at midnight. 
+
 > This feature is available in the standard S3 API.
 
 When using a standard File System, the application needs to manage the deletion of the old data.
@@ -179,9 +185,9 @@ Go to *Swift API* -> *Requests*
 
 ![Swift API](swift.png)
 
-For the Swift API, you need to indicate the endpoint, user and password.
+For the Swift API, you need to indicate the endpoint, user and password before executing the different examples.
 
-If you are using your own ECS system, then you need to indicate the corresponding endpoint (for example, *http://ip:9024/auth/v1.0*).
+If you are using your own ECS system, then you need to indicate the corresponding endpoint (for example, *http://ip:9024/auth/v1.0*). You also need to create the Swift password using the ECS admin UI
 
 The password is a Swift password, not the Secret Key.
 
@@ -233,7 +239,7 @@ Go to *Atmos API* -> *Requests*
 
 ![Atmos API](atmos.png)
 
-For the Atmos API, you need to indicate the endpoint and subtenant.
+For the Atmos API, you need to indicate the endpoint and subtenant. The subtenant will be obtained as a response header of the first step of each example. So, you need to copy the subtenant value and paste it in the *Subtenant* field each time.
 
 If you are using your own ECS system, then you need to indicate the corresponding endpoint (for example, *http://ip:9022*).
 
