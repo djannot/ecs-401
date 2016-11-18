@@ -2,14 +2,7 @@
 
 The ECS 401 training is focusing on hands-on labs to allow participants to become more familiar with different  ECS features and use cases. 
 
-- [S3, Swift and Atmos APIs](apis/apis.md)
-- [ECS-Sync](ecssync/ecssync.md)
-- [Spark](spark/spark.md)
-- NFS
-	- [Archiving use case](nfs/archive.md)
-	- [Multi protocol access use case](nfs/multiproto.md)
-- [Load balancers](lb/lb.md)
-- [COSBench](cosbench/cosbench.md)
+
 
 This training is leveraging the ECS 3.0 VLAB.
 
@@ -28,5 +21,16 @@ Before starting a new lab, you need to make sure that no other container is runn
 Run the `docker ps` command to list the container that are currently running and `docker rm -f <container Id>` to delete a container.
 
 If you get any *IPTABLES* related error when starting a new Docker container, you need to restart the Docker service by running the `systemctl restart docker` command.
+
+Click on the corresponding lab to start it:
+
+- [S3, Swift and Atmos APIs](apis/apis.md)
+- [ECS-Sync](ecssync/ecssync.md)
+- [Spark](spark/spark.md)
+- NFS
+	- [Archiving use case](nfs/archive.md)
+	- [Multi protocol access use case](nfs/multiproto.md)
+- [Load balancers](lb/lb.md)
+- [COSBench](cosbench/cosbench.md)
 
 This training has been developed by Cristina Alvarez, Christoffer Braendstrup and Denis Jannot.
