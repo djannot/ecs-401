@@ -6,7 +6,7 @@ It is a best practice to complement the ECS with a Load Balancer, especially whe
 
 This document focuses on how to deploy and configure Brocade vTM and NGNIX load balancers. However, most of the ideas described in this document can be applied to other load balancer models.
 
-The goal of this lab is to learn how to configure Brocade Virtual Traffic Manager (vTM)  and NGNIX Load Balancers to provide high availability for different access methods (S3, NFS, …) and topologies (single site or multi sites, …).
+The goal of this lab is to learn how to configure Brocade Virtual Traffic Manager (vTM)  and NGNIX Load Balancers to provide high availability for different access methods (S3, NFS, …) and configurations (non-SSL, SSL).
 
 ## Prerequisites
 
@@ -14,7 +14,15 @@ The goal of this lab is to learn how to configure Brocade Virtual Traffic Manage
 
 If you don't have access to an ECS system, you can create an account on [ECS Test Drive](http://portal.ecstestdrive.com).
 
+For the lab, please use the provided ECS endpoints.
+
 ### Load Balancers 
+
+The first half of the lab will be focused on Brocade load balancing, running in a container in your VM, listening requests at ports 9020/9021. Then you will switch to a NGNIX load balancer, also running in a Docker container, but listening requests at ports 80/443, to avoid conflicts. The pictures at the begging of each section illustrate what you try to achieve there.
+
+For both Brocade and NGNIX , this lab covers simple S3 and NFS load balancing and SSL configuration in a single site. For more advanced configurations, please refer to the ECS POC test plan for [ECS & Brocade Load Balancers - ECS FastPass / Proof of Concept Test Plans in Inside EMC](https://inside.dell.com/docs/DOC-218468).
+
+>**Note:** Please open the mentioned document as a reference, since it includes screenshots  that could help with the Brocade load balancer configuration.
 
 
 # Lab
@@ -24,13 +32,17 @@ If you don't have access to an ECS system, you can create an account on [ECS Tes
 
 ### S3 Load Balancing
 
-**Configuration tasks**
+In this section, we'll configure a Brocade Load Balancer, running in a Docker Container in your VM. It will be mapped to the IP of your VM, port 9090.
+The load balancer will listen requests at port 9020 and will redirect them to your ECS nodes, port 9020.
 
 ![vTM - S3 Load balancing](s3_1.jpg)
 
-- Disable the firewall
+**Configuration tasks**
+
+- Check the firewall of your VM, and stop it if needed.
 
 ```
+systemctl status firewalld
 systemctl stop firewalld
 ```
 
@@ -40,7 +52,9 @@ systemctl stop firewalld
 docker run -e ZEUS_EULA=accept -e ZEUS_PASS=password --privileged -t --net=host -d djannot/brocade-vtm
 ```
 
-- Login with admin/password and click on `Use developper mode`
+- Launch the Brocade UI
+    - `http://ip_vm:9090`
+    - Login with admin/password and click on `Use developper mode`
 - Create a pool using the ECS node IPs
 	- Use the right port for S3 (9020)
 	- Use the right Health Monitor (Simple HTTP)
@@ -63,20 +77,25 @@ docker run -e ZEUS_EULA=accept -e ZEUS_PASS=password --privileged -t --net=host 
 	
 ### SSL configuration
 
-**Configuration tasks**
+In this section, we'll add SSL encryption to your Brocade Load Balancer configuration.
+
+According to the ECS best practices, we'll offload the SSL complexity in the Load Balancer. This way, the communication between the application and the Load Balancer will be encrypted (in this case, Load Balancer listening at port 9021), but the communication between the Load Balancer and your ECS nodes will be non-encrypted (port 9020). 
 
 ![vTM - S3 SSL Load balancing](s3_2.jpg)
+
+**Configuration tasks**
 
 - [Optional] - Some applications, like CloudArray, use Virtual Style Addressing. In that case, a wildcard for the load balancer name is needed.
 	- Create a wildcard **.lb.vlab.local* and verify that you can ping *bucket.lb.vlab.local*
 	- You can launch the Domain Controller from mRemoteNG; it's already preconfigured.
 
-![DNS wildcard](wildcard.png)
+>![DNS wildcard](wildcard.png)
 
 - Modify your Virtual Server configuration to use SSL. 
 	- Listening at port 9021 (HTTP) 
 	- Enable SSL Decryption and create a certificate
-		- Manage SSL certificates -> Create Self-Signed Certificate -> Certificate Signing Request. The Name should be lb.vlab.local and the Common Name should match with the wildcard (*.lb.vlab.local)
+		- Manage SSL certificates -> Create Self-Signed Certificate -> Certificate Signing Request. 
+		- The Name should be *lb.vlab.local* and the *Common Name* should match with the *wildcard* (*.lb.vlab.local).
 
 **Verification**
 
@@ -85,19 +104,23 @@ docker run -e ZEUS_EULA=accept -e ZEUS_PASS=password --privileged -t --net=host 
 	- Verity that S3 Browser is configured for HTTPS
 		- Browser Tools -> Options -> Connection -> Check *Use Secure Transfer (HTTPS)*
 
-**Note:** When using ISVs, the certificate must be also loaded in the application, so that the communication between the application and the Load Balancer is encripted. It is recommended to offload SSL at the Load Balancer level, but it is possible to also configure end-to-end SSL encryption.
+>**Note:** When using ISVs, the certificate must be also loaded in the application, so that the communication between the application and the Load Balancer is encrypted. It is recommended to offload SSL at the Load Balancer level, but it is possible to also configure end-to-end SSL encryption.
 
 ### NFS Load Balancing
 
+Several port, TCP and UDP, are involved when talking about NFS. In this case you will have to create several Virtual Servers, each one listening at one of these ports and redirecting the traffic to the ECS nodes, same port.
+
 ![vTM - NFS Load balancing](nfs_1.jpg)
+
+**Configuration tasks**
 
 - Create Pools and Virtual Servers for the TCP and UDP ports used in NFS (111, 2049 and 10000). 
 	- Configure TCP Virtual Servers as *Generic Streaming* 
 	- Configure UDP Virtual Servers as *UDP - Streaming*
 	
-At the end you should get something like this:
+> At the end you should get something like this:
 
-![vTM - NFS Load balancing](nfs_2.jpg)
+> ![vTM - NFS Load balancing](nfs_2.jpg)
 
 - Configure sticky sessions in your NFS pools
 	- Create a session persistence configuration at the IP level and associate it with your NFS pools.
@@ -110,7 +133,11 @@ At the end you should get something like this:
 
 ### S3 Load Balancing
 
+In this section, we'll configure a NGNIX Load Balancer, running in a Docker Container in your VM. The new NGNIX will listen requests at port 80 and will redirect them to your ECS nodes, port 9020.
+
 ![NGINX - S3 Load balancing](ngnix_1.jpg)
+
+**Configuration tasks**
 
 - Disable selinux by executing the `su -c "setenforce 0"` command to avoid a permission issue in the Docker container
 - Create a `/root/nginx` directory
@@ -164,7 +191,11 @@ docker run --net=host --name nginxlb -v /root/nginx:/etc/nginx -d nginx
 
 ### SSL configuration
 
+In this section, we'll add SSL encryption to your Brocade Load Balancer configuration. Your new NGNIX will listen requests at port 443, it will offload the SSL complexity, and it will redirect them to the ECS nodes, port 9020.
+
 ![NGNIX - S3 SSL Load balancing](ngnix_2.jpg)
+
+**Configuration tasks**
 
 - Create a `/root/nginx/ssl` directory
 - Create a certificate for the Common Name **.lb.vlab.local*
@@ -200,4 +231,6 @@ docker restart nginxlb
 
 ## References
 
-[ECS POC test plans, including the Brocade Load Balancer one](https://inside.dell.com/docs/DOC-218468)
+- [ECS & Brocade Load Balancers - ECS FastPass / Proof of Concept Test Plans, Inside EMC](https://inside.dell.com/docs/DOC-218468)
+- [Brocade vTM website](http://www.brocade.com/en/products-services/software-networking/application-delivery-controllers/virtual-traffic-manager.html)
+
