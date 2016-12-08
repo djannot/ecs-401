@@ -8,7 +8,7 @@ You'll use the ECS API User Interface web application to discover the different 
 
 [ECS API User Interface](https://github.com/djannot/ecsui) is a web application developed in Golang and leveraging AngularJS.
 
-The goals of ECSUI are to:
+The goals of the ECS API User Interface are to:
 
 - demonstrate S3 features (versioning, lifecycle policy, …) and several unique ECS capabilities using either S3 or Swift (byte range, retentions, metadata search, …)
 - simplify the usage of several REST APIs (S3, Swift, Atmos, ECS)
@@ -20,9 +20,9 @@ The goals of ECSUI are to:
 
 If you don't have access to an ECS system, you can create an account on [ECS Test Drive](http://portal.ecstestdrive.com).
 
-### ECSUI
+### ECS API User Interface
 
-I created a Docker container for the ECSUI application.
+I created a Docker container for the ECS API User Interface application.
 
 Pull the container image using the command below:
 
@@ -36,7 +36,7 @@ You can then start the container with the following command:
 docker run -d -p 80:80 djannot/ecsui
 ```
 
-The ECSUI application can now be accessed with a web browser on port 80.
+The ECS API User Interface application can now be accessed with a web browser on port 80.
 
 ![Login](login.png)
 
