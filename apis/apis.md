@@ -4,9 +4,9 @@ DellEMC Elastic Cloud Storage (ECS) is a software-defined, cloud-scale, object s
 
 ECS supports several Object Storage APIs (Amazon S3, Openstack Swift, Atmos, CAS), but also extends them to provide unique capabilities (metadata search, retention, byte range update, ...).
 
-You'll use the ECSUI web application to discover the different features. 
+You'll use the ECS API User Interface web application to discover the different features. 
 
-[ECSUI](https://github.com/djannot/ecsui) is a web application developed in Golang and leveraging AngularJS.
+[ECS API User Interface](https://github.com/djannot/ecsui) is a web application developed in Golang and leveraging AngularJS.
 
 The goals of ECSUI are to:
 

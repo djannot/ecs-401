@@ -2,8 +2,6 @@
 
 The ECS 401 training is focusing on hands-on labs to allow participants to become more familiar with different  ECS features and use cases. 
 
-
-
 This training is leveraging the ECS 3.0 VLAB.
 
 The environment is composed of 2 ECS systems deployed as 3 different nodes (192.168.1.11-13 and 192.168.1.21-23). A program is available on the Desktop to check the DT status of both ECS VDCs.
