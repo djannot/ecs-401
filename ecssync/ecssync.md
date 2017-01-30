@@ -234,13 +234,13 @@ Filesystem on the ECS-Sync VM | ECS S3 Bucket
 
 - In order to create a Sync job, go to *Status* Tab and click *New Sync* 
 
-<img src="ui2_new_3.1.jpg" width="250" /> 
+![UI2](ui2_new_3.1.jpg) 
 
-    - Select *Filesystem* in the *Source* options
-   	 -  Indicate the path of the local FileSystem to copy
-    - Select *ECS S3* in *Target* options. 
-   	 -  Indicate the credential of your S3 target.
-       	 -  **Note** It is recommended to manually create buckets in the ECS GUI, so that you can control the bucket parameters (FS enabled,....). 
+- Select *Filesystem* in the *Source* options
+- Indicate the path of the local FileSystem to copy
+- Select *ECS S3* in *Target* options. 
+- Indicate the credential of your S3 target.
+- **Note** It is recommended to manually create buckets in the ECS GUI, so that you can control the bucket parameters (FS enabled,....). 
 
 ![UI3](ui3_new_3.1.jpg)
  
