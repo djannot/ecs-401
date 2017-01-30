@@ -232,9 +232,9 @@ Source | Target
 Filesystem on the ECS-Sync VM | ECS S3 Bucket
 /home/ecssync/ecs-sync-3.1/sample/ | bucketnfsui-u1
 
-- In order to create a Sync job, go to *Status* Tab and click "New Sync* 
+- In order to create a Sync job, go to *Status* Tab and click *New Sync* 
 
-![UI2](ui2_new_3.1.jpg)
+<img src="ui2_new_3.1.jpg" width="250" /> 
 
     - Select *Filesystem* in the *Source* options
    	 -  Indicate the path of the local FileSystem to copy
