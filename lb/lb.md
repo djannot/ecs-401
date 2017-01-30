@@ -243,20 +243,23 @@ Finally, let's configure NGNIX to offload the SSL complexity in a secure scenari
 - Create a `/root/nginx/ssl` directory
 
 - Create a certificate for the Common Name **.lb.vlab.local*
-	- You can either create a new certificate using OpenSSL
-		- /etc/nginx/ssl/server.crt
-		- /etc/nginx/ssl/server.key
-	- Or reuse the certificate you created in the previous section with Brocade, since you are using the same CN = **.lb.vlab.local*
-		- In order to get the certificate created in the vTM, run
-			`docker ps` -> Get the containier ID
-			`docker cp <container id>:/usr/local/zeus/zxtm-11.0/conf_A/ssl/server_keys/lb.vlab.local.public /root/nginx/ssl/server.crt`
-			`docker cp <container id>:/usr/local/zeus/zxtm-11.0/conf_A/ssl/server_keys/lb.vlab.local.private /root/nginx/ssl/server.key`
-
+    - You can either create a new certificate using OpenSSL
+    	- /etc/nginx/ssl/server.crt
+    	- /etc/nginx/ssl/server.key
+    - Or reuse the certificate you created in the previous section with Brocade, since you are using the same CN = **.lb.vlab.local*
+    	-  In order to get the certificate created in the vTM, run:
+```
+docker ps #Get the containier ID
+docker cp <container id>:/usr/local/zeus/zxtm-11.0/conf_A/ssl/server_keys/lb.vlab.local.public /root/nginx/ssl/server.crt
+docker cp <container id>:/usr/local/zeus/zxtm-11.0/conf_A/ssl/server_keys/lb.vlab.local.private /root/nginx/ssl/server.key
+```
 - Add the following lines to the `server` section of the `nginx.conf` file:
 
-> `listen 443 default_server ssl;`
-> `ssl_certificate         /etc/nginx/ssl/server.crt;`
-> `ssl_certificate_key     /etc/nginx/ssl/server.key;`
+```
+listen 443 default_server ssl;
+ssl_certificate         /etc/nginx/ssl/server.crt;
+ssl_certificate_key     /etc/nginx/ssl/server.key;
+```
 
 - Restart the Docker container
 
@@ -271,6 +274,6 @@ Finally, let's configure NGNIX to offload the SSL complexity in a secure scenari
 
 ## References
 
-[ECS & Brocade Load Balancers Test Plan](https://inside.dell.com/docs/DOC-218468)
-Brocade vTM - http://www.brocade.com/en/products-services/software-networking/application-delivery-controllers/virtual-traffic-manager.html
-NGNIX Wiki - https://www.nginx.com/resources/wiki/
+- [ECS & Brocade Load Balancers Test Plan](https://inside.dell.com/docs/DOC-218468)
+- Brocade vTM - http://www.brocade.com/en/products-services/software-networking/application-delivery-controllers/virtual-traffic-manager.html
+- NGNIX Wiki - https://www.nginx.com/resources/wiki/
