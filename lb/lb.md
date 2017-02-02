@@ -79,13 +79,16 @@ For  detailed information about how to create Virtual Servers or vPools, please,
 - Start the Docker container
 > `docker run -e ZEUS_EULA=accept -e ZEUS_PASS=password --privileged -t --net=host -d djannot/brocade-vtm`
 
-- Login with admin/password and click on *Use developer mode*
+- Open a web browser *http://192.168.1.30:9090*
+    - Login with *admin/password* and click on *Use developer mode*
 
 - Create a pool using the ECS node IPs
     - Use the right port for S3 (9020)
     - Use the right Health Monitor (Simple HTTP)
-	
-- Create a Virtual Server, listening at port 9020, redirecting the traffic to the pool you just created
+ 
+> ![vPool Creation](s3_0.jpg)	
+
+- Create a Virtual Server, listening at port 9020, redirecting the traffic to the pool you just created. Make sure your Virtual Server is enabled.
 
 - Create a DNS Host record for your virtual server -> lb.vlab.local 
 	- The ECS already has a DNS record (ecs.vlab.local)
@@ -129,8 +132,10 @@ In this second exercise, we'll configure the Brocade vTM, listening at *lb.vlab.
 
 - Modify your Virtual Server configuration to use SSL. 
 	- Listening at port 9021 (HTTP) 
-	- Enable SSL Decryption and create a certificate
-		- Manage SSL certificates -> Create Self-Signed Certificate -> Certificate Signing Request. The Name should be lb.vlab.local and the Common Name should match with the wildcard (*.lb.vlab.local)
+	- Go to SSL Decryption
+        	- Enable SSL Decryption
+		- Create a certificate:
+        		- Manage SSL certificates -> Create Self-Signed Certificate -> Certificate Signing Request. The Name should be lb.vlab.local and the Common Name should match with the wildcard (*.lb.vlab.local)
 
 **Verification**
 
@@ -155,10 +160,11 @@ In this third exercise, we'll configure the Brocade vTM, listening at *lb.vlab.l
 
 ![vTM - NFS Load balancing](nfs_1.jpg)
 
-- Create Pools and Virtual Servers for the TCP and UDP ports used in NFS (111, 2049 and 10000). 
+- Create Virtual Pools and Virtual Servers for the TCP and UDP ports used in NFS (111, 2049 and 10000). 
 	- Configure TCP Virtual Servers as *Generic Streaming* 
 	- Configure UDP Virtual Servers as *UDP - Streaming*
-	
+	- Use *ping* as Health Monitor for your vPools
+
 > At the end you should get something like this:
 
 > ![vTM - NFS Load balancing](nfs_2.jpg)

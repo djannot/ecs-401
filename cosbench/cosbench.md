@@ -132,7 +132,7 @@ A workload is represented as an XML file with the following structure:
 <?xml version="1.0" encoding="UTF-8" ?>
 <workload name="s3-sample" description="sample benchmark for s3">
 
-  <storage type="s3" config="accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;proxyhost=;proxyport=;endpoint=http://192.168.1.11:9020" />
+  <storage type="s3" config="accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;endpoint=http://192.168.1.11:9020" />
 
   <workflow>
 
@@ -268,7 +268,7 @@ Please, refer to *Apendix 2: Adding more COSBench drivers* for the Drive additio
 Use the following line in the XML job config file:
 
 ```
-<storage type="s3" config="path_style_access=true;accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;proxyhost=;proxyport=;endpoint=http://ecs-1-1.vlab.local:9020"/>
+<storage type="s3" config="path_style_access=true;accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;endpoint=http://ecs-1-1.vlab.local:9020"/>
 
 ````
 Please, note that we introduce a new option *path_style_access=true* to define the addressing style and avoid DNS resolution errors, since we now use a *hostname* as the endpoint.
@@ -290,7 +290,7 @@ Finally, we can also specify which operations/loads we run in each Driver (that 
 ```
 <?xml version="1.0" encoding="UTF-8" ?>
 <workload name="ECS MAX Tests" description="ECS MAX Test">
-<storage type="s3" config="path_style_access=true;accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;proxyhost=;proxyport=;endpoint=http://ecs-1-1.vlab.local:9020"/>
+<storage type="s3" config="path_style_access=true;accesskey=cosbench;secretkey=PAVCYmIgSyuLgFIXX+3r9gHS4STb/ebFn9CPbhrO;endpoint=http://ecs-1-1.vlab.local:9020"/>
 
 <workflow>
       <workstage name="init">
@@ -397,13 +397,21 @@ There is a bug in the current COSBench release that can provoke errors when runn
 
 In order to fix it, you need to:
 
-- Stop all COSBench processes (controller, drivers)
+- Start your Cosbench container, if it is not running. 
+
+```
+docker run -it --rm -p 19088:19088 -p 18088:18088 --name=driver1 djannot/cosbench:0.4.2.c4 bash 
+```
+- In your container, Stop all COSBench processes (controller, drivers) if they are running
+> `./stop-all.sh`
+
 - Edit `cosbench-start.sh`, locate the *java* launching line, and add 
     "-Dcom.amazonaws.services.s3.disableGetObjectMD5Validation=true"
 ```
 /usr/bin/nohup java -Dcom.amazonaws.services.s3.disableGetObjectMD5Validation=true -Dcosbench.tomcat.config=$TOMCAT_CONFIG -server -cp main/* org.eclipse.equinox.launcher.Main -configuration $OSGI_CONFIG -console $OSGI_CONSOLE_PORT 1> $BOOT_LOG 2>&1 &
 ```
-- Restart COSBench processes
+- Restart COSBench services
+> `./start-all.sh`
 
 #References
 
