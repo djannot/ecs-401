@@ -187,11 +187,10 @@ Filesystem on the ECS-Sync VM | ECS S3 Bucket
 - This is the expected output you should get:
 
 ```
-EcsSync v3.1
-2017-01-20 08:50:50 WARN  [main           ] RestServer: REST server listening at http://localhost:9200/
-Transferred 34,050 bytes in 1 seconds (34,050 bytes/s)
-Successful files: 12 (12/s) Failed Files: 0
-Failed files: []
+# ecs-sync-ctl --submit sample/test1.xml
+04-03 22:21:30INFO  [main] EcsSyncCtl:206 - Command: Submit file sample/test1.xml
+04-03 22:21:31DEBUG [main] EcsSyncCtl:416 - HTTP Response 201:Created
+Submitted Job 2
 ```
 
 - Verify with S3 Browser that *bucketnfs-u1* has been populated with the  content of */home/ecssync/ecs-sync-3.1/sample/* directory.
@@ -375,7 +374,7 @@ And this is a typical output when querying the status of an ECS-Sync copy.
 
 `ecs-sync-ctl  --status <job number>`
 
-````
+```
 01-27 12:46:51INFO  [main] EcsSyncCtl:202 - Command: Status Job #2
 Job Status: Running
 Job Time: 2m 5s 912ms
@@ -495,12 +494,18 @@ When executing the ECS-Sync copy from the CLI, the CLI output will include error
 Everything is also tracked in the ECS-Sync Logs `/var/log/ecs-sync/`
 
 ```
-tail -f  /var/log/ecs-sync/ecs-sync.log
+# tail /var/log/ecs-sync/ecs-sync.log
+2017-01-30 12:30:07 WARN  [sync-pool-t-3  ] EcsSync: O--R object /tmp/nfssource/4/8/file1819 failed 1 time (queuing for retry): java.net.SocketTimeoutException: connect timed out
+2017-01-30 12:30:07 WARN  [sync-pool-t-2  ] EcsSync: O--R object /tmp/nfssource/2/4/file3441 failed 1 time (queuing for retry): java.net.SocketTimeoutException: connect timed out
 EcsSync v3.1
-2016-11-10 12:07:36 WARN  [main           ] RestServer: REST server listening at http://localhost:9200/
-Transferred 10,744,882 bytes in 1 seconds (10,744,882 bytes/s)
-Successful files: 6 (6/s) Failed Files: 0
-Failed files: []
+2017-02-16 08:58:23 WARN  [main           ] RestServer: REST server listening at http://localhost:9200/
+2017-04-03 10:19:25 ERROR [pool-5-thread-1] EcsSync: Error configuring target storage
+2017-04-03 10:19:25 ERROR [pool-5-thread-1] EcsSync: unexpected exception
+com.emc.ecs.sync.config.ConfigurationException: The bucket bucketnfs-u1 does not exist.
+2017-04-03 10:19:26 WARN  [pool-5-thread-1] EcsSync: terminated early!
+2017-04-03 10:19:26 ERROR [pool-5-thread-1] SyncJobService: sync job 1 threw an unexpected error
+com.emc.ecs.sync.config.ConfigurationException: The bucket bucketnfs-u1 does not exist.
+
 ```
 
 - Example of an output with errors, failed files at the end:
@@ -592,7 +597,7 @@ done
 
 - ECS-Sync releases https://github.com/EMCECS/ecs-sync/releases
 - ECS-Sync documentation  https://community.emc.com/docs/DOC-38905
-- ECS-Sync wiki [https://github.com/EMCECS/ecs-sync/wiki/](https://github.com/EMCECS/ecs-sync/wiki/)
+- ECS-Sync wiki https://github.com/EMCECS/ecs-sync/wiki/](https://github.com/EMCECS/ecs-sync/wiki/
 - For general questions on ECS-Sync and configuring your job file, please use the “ECS Sync Migrations” distribution list: ecs.sync.migrations@emc.com
 - ECS-Sync General Performance metrics: https://github.com/EMCECS/ecs-sync/wiki/General-Performance-Metrics
 

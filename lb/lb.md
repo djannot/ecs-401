@@ -86,7 +86,7 @@ For  detailed information about how to create Virtual Servers or vPools, please,
     - Use the right port for S3 (9020)
     - Use the right Health Monitor (Simple HTTP)
  
-> ![vPool Creation](s3_0.jpg)	
+![vPool Creation](s3_0.JPG)	
 
 - Create a Virtual Server, listening at port 9020, redirecting the traffic to the pool you just created. Make sure your Virtual Server is enabled.
 
