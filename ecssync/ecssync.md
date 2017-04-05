@@ -193,6 +193,9 @@ Filesystem on the ECS-Sync VM | ECS S3 Bucket
 Submitted Job 2
 ```
 
+- Execute the following command to get the status:
+`ecs-sync-ctl --status <job ID>`
+
 - Verify with S3 Browser that *bucketnfs-u1* has been populated with the  content of */home/ecssync/ecs-sync-3.1/sample/* directory.
 
 
